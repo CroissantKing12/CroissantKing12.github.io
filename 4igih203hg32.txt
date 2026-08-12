@@ -2,4 +2,6 @@ Updates 26/8/12
 
 New Updates app!
 New Password Measurements!
-Website change soon!!!
+Website change Tomorrow!
+New sign in system will be added tomorrow to identify users. It will also come with a new password system so every user will get their own assigned password to access the website. 
+
