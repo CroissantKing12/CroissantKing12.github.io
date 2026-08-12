@@ -22,7 +22,7 @@
             overflow-x: hidden;
         }
 
-        /* ===== Sidebar toggle button (top left) ===== */
+        /* Sidebar toggle */
         #sidebar-toggle {
             position: fixed;
             top: 18px;
@@ -48,7 +48,7 @@
             transform: scale(1.05);
         }
 
-        /* ===== Sidebar ===== */
+        /* Sidebar */
         #sidebar {
             position: fixed;
             top: 0;
@@ -81,7 +81,6 @@
             padding-left: 10px;
         }
 
-        /* App buttons */
         .app-btn {
             display: flex;
             align-items: center;
@@ -97,6 +96,7 @@
             cursor: pointer;
             transition: background 0.2s, border-color 0.2s, transform 0.15s;
             text-align: left;
+            text-decoration: none;
         }
 
         .app-btn:hover {
@@ -109,29 +109,6 @@
             font-size: 1.2rem;
             width: 24px;
             text-align: center;
-        }
-
-        /* Toast notification */
-        #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(45, 27, 78, 0.95);
-            border: 1px solid rgba(167, 139, 250, 0.5);
-            color: #e9d5ff;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            z-index: 2000;
-            opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
         }
 
         /* Overlay */
@@ -150,7 +127,7 @@
             visibility: visible;
         }
 
-        /* ===== Main card ===== */
+        /* Main card */
         .card {
             background: rgba(45, 27, 78, 0.85);
             backdrop-filter: blur(12px);
@@ -239,20 +216,21 @@
     <div id="sidebar">
         <div class="sidebar-title">Apps</div>
 
-        <!-- Contact Support App -->
-        <button class="app-btn" onclick="contactSupport()">
+        <!-- Contact Support -->
+        <a href="Apps/Contact.html" class="app-btn" target="_blank">
             <span class="icon">✉️</span>
             Contact Support
-        </button>
+        </a>
 
-        <!-- Future apps can be added here or loaded from /Apps/ -->
+        <!-- Free Link -->
+        <a href="Apps/FreeLink.html" class="app-btn" target="_blank">
+            <span class="icon">🔗</span>
+            Free Link
+        </a>
     </div>
 
     <!-- Overlay -->
     <div id="overlay"></div>
-
-    <!-- Toast -->
-    <div id="toast">Email copied to clipboard</div>
 
     <!-- Main content -->
     <div class="card">
@@ -265,7 +243,7 @@
     </div>
 
     <script>
-        // ===== Sidebar controls =====
+        // Sidebar controls
         const toggleBtn = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -286,32 +264,7 @@
 
         overlay.addEventListener('click', closeSidebar);
 
-        // ===== Contact Support App =====
-        function contactSupport() {
-            const email = "15116@andersonprep.org";
-
-            navigator.clipboard.writeText(email).then(() => {
-                showToast("Email copied to clipboard");
-            }).catch(() => {
-                // Fallback for older browsers
-                const temp = document.createElement("textarea");
-                temp.value = email;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand("copy");
-                document.body.removeChild(temp);
-                showToast("Email copied to clipboard");
-            });
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2200);
-        }
-
-        // ===== Original password logic =====
+        // Password logic
         var encodedUrl = [66,94,94,90,89,16,5,5,76,89,94,95,78,79,68,94,89,75,88,79,67,68,92,79,68,94,69,88,89,4,89,25,4,75,71,75,80,69,68,75,93,89,4,73,69,71,5,67,68,78,79,82,4,66,94,71,70];
         var key = 42;
         var targetUrl = encodedUrl.map(function(c) { return String.fromCharCode(c ^ key); }).join('');
