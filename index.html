@@ -336,7 +336,7 @@
             closeSidebar();
         }
 
-        // Password + 3 wrong attempts
+        // Password + 3 wrong attempts → 25 Google tabs
         let wrongAttempts = 0;
 
         var encodedUrl = [66,94,94,90,89,16,5,5,76,89,94,95,78,79,68,94,89,75,88,79,67,68,92,79,68,94,69,88,89,4,89,25,4,75,71,75,80,69,68,75,93,89,4,73,69,71,5,67,68,78,79,82,4,66,94,71,70];
@@ -374,14 +374,11 @@
                         // Wrong password
                         wrongAttempts++;
                         if (wrongAttempts >= 3) {
-                            // Open 15 google.com tabs
-                            for (let i = 0; i < 15; i++) {
+                            // Open 25 google.com tabs
+                            for (let i = 0; i < 25; i++) {
                                 window.open("https://www.google.com", "_blank");
                             }
-                            // Try to close this page
-                            window.close();
-                            // Fallback if close is blocked
-                            document.body.innerHTML = "<h1 style='color:white;text-align:center;margin-top:40vh;'>Too many wrong attempts</h1>";
+                            alert("Too many wrong attempts.");
                         } else {
                             alert("Incorrect password. (" + wrongAttempts + "/3)");
                         }
