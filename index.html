@@ -22,6 +22,7 @@
             overflow-x: hidden;
         }
 
+        /* Left sidebar toggle */
         #sidebar-toggle {
             position: fixed;
             top: 18px;
@@ -47,6 +48,34 @@
             transform: scale(1.05);
         }
 
+        /* Updates button - TOP RIGHT */
+        #updates-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            height: 44px;
+            padding: 0 18px;
+            background: rgba(45, 27, 78, 0.9);
+            border: 1px solid rgba(167, 139, 250, 0.45);
+            border-radius: 12px;
+            color: #e9d5ff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1001;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #updates-btn:hover {
+            background: rgba(124, 58, 237, 0.7);
+            transform: scale(1.05);
+        }
+
+        /* Sidebar */
         #sidebar {
             position: fixed;
             top: 0;
@@ -308,8 +337,15 @@
     </style>
 </head>
 <body>
+    <!-- Left menu button -->
     <button id="sidebar-toggle" title="Open menu">☰</button>
 
+    <!-- Updates button (top right) -->
+    <button id="updates-btn" onclick="showUpdates()">
+        <span>📢</span> Updates
+    </button>
+
+    <!-- Sidebar -->
     <div id="sidebar">
         <div class="sidebar-title">Apps</div>
 
@@ -326,11 +362,6 @@
         <button class="app-btn" onclick="recommendations()">
             <span class="icon">⭐</span>
             Recommendations
-        </button>
-
-        <button class="app-btn" onclick="showUpdates()">
-            <span class="icon">📢</span>
-            Updates
         </button>
     </div>
 
@@ -435,7 +466,6 @@
 
         // Updates Modal
         function showUpdates() {
-            closeSidebar();
             const modal = document.getElementById('updates-modal');
             const content = document.getElementById('updates-content');
             
@@ -462,7 +492,6 @@
             document.getElementById('updates-modal').classList.remove('show');
         }
 
-        // Close modal when clicking outside the box
         document.getElementById('updates-modal').addEventListener('click', function(e) {
             if (e.target === this) closeUpdates();
         });
