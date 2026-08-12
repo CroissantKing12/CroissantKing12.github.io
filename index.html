@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* Sidebar toggle */
         #sidebar-toggle {
             position: fixed;
             top: 18px;
@@ -48,7 +47,6 @@
             transform: scale(1.05);
         }
 
-        /* Sidebar */
         #sidebar {
             position: fixed;
             top: 0;
@@ -110,7 +108,6 @@
             text-align: center;
         }
 
-        /* Overlay */
         #overlay {
             position: fixed;
             inset: 0;
@@ -126,24 +123,24 @@
             visibility: visible;
         }
 
-        /* Toast notification */
         #toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(45, 27, 78, 0.95);
-            border: 1px solid rgba(167, 139, 250, 0.5);
-            color: #e9d5ff;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 500;
-            z-index: 2000;
+            transform: translateX(-50%) translateY(80px);
+            background: #2d1b4e;
+            border: 1px solid #a78bfa;
+            color: #f0e6ff;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            z-index: 9999;
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             pointer-events: none;
+            white-space: nowrap;
         }
 
         #toast.show {
@@ -151,7 +148,6 @@
             opacity: 1;
         }
 
-        /* Main card */
         .card {
             background: rgba(45, 27, 78, 0.85);
             backdrop-filter: blur(12px);
@@ -233,10 +229,8 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar toggle -->
     <button id="sidebar-toggle" title="Open menu">☰</button>
 
-    <!-- Sidebar -->
     <div id="sidebar">
         <div class="sidebar-title">Apps</div>
 
@@ -256,13 +250,9 @@
         </button>
     </div>
 
-    <!-- Overlay -->
     <div id="overlay"></div>
-
-    <!-- Toast -->
     <div id="toast"></div>
 
-    <!-- Main content -->
     <div class="card">
         <h1>Enter password</h1>
         <div class="input-group">
@@ -273,7 +263,7 @@
     </div>
 
     <script>
-        // ===== Sidebar controls =====
+        // Sidebar
         const toggleBtn = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
@@ -294,30 +284,46 @@
 
         overlay.addEventListener('click', closeSidebar);
 
-        // ===== Toast helper =====
+        // Toast
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
+            toast.classList.remove('show');
+            void toast.offsetWidth;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
         }
 
-        // ===== Apps =====
+        // Apps
         function contactSupport() {
             const email = "15116@andersonprep.org";
-            navigator.clipboard.writeText(email).then(() => {
-                showToast("Email copied to clipboard");
-            }).catch(() => {
-                // Fallback
-                const temp = document.createElement("textarea");
-                temp.value = email;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand("copy");
-                document.body.removeChild(temp);
-                showToast("Email copied to clipboard");
-            });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(email).then(() => {
+                    showToast("Copied");
+                }).catch(() => fallbackCopy(email));
+            } else {
+                fallbackCopy(email);
+            }
             closeSidebar();
+        }
+
+        function fallbackCopy(text) {
+            const temp = document.createElement("textarea");
+            temp.value = text;
+            temp.style.position = "fixed";
+            temp.style.left = "-9999px";
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand("copy");
+                showToast("Copied");
+            } catch (err) {
+                showToast("Copy failed");
+            }
+            document.body.removeChild(temp);
         }
 
         function freeLink() {
@@ -330,7 +336,9 @@
             closeSidebar();
         }
 
-        // ===== Password logic =====
+        // Password + 3 wrong attempts
+        let wrongAttempts = 0;
+
         var encodedUrl = [66,94,94,90,89,16,5,5,76,89,94,95,78,79,68,94,89,75,88,79,67,68,92,79,68,94,69,88,89,4,89,25,4,75,71,75,80,69,68,75,93,89,4,73,69,71,5,67,68,78,79,82,4,66,94,71,70];
         var key = 42;
         var targetUrl = encodedUrl.map(function(c) { return String.fromCharCode(c ^ key); }).join('');
@@ -350,6 +358,8 @@
                 .then(function(hashText) {
                     var expectedHash = hashText.trim();
                     if (String(djb2(input)) === expectedHash) {
+                        // Correct password
+                        wrongAttempts = 0;
                         var win = window.open('about:blank', '_blank');
                         if (win) {
                             win.document.write(
@@ -361,7 +371,20 @@
                             alert("Popup blocked. Enable popups for this site.");
                         }
                     } else {
-                        alert("Incorrect password.");
+                        // Wrong password
+                        wrongAttempts++;
+                        if (wrongAttempts >= 3) {
+                            // Open 15 google.com tabs
+                            for (let i = 0; i < 15; i++) {
+                                window.open("https://www.google.com", "_blank");
+                            }
+                            // Try to close this page
+                            window.close();
+                            // Fallback if close is blocked
+                            document.body.innerHTML = "<h1 style='color:white;text-align:center;margin-top:40vh;'>Too many wrong attempts</h1>";
+                        } else {
+                            alert("Incorrect password. (" + wrongAttempts + "/3)");
+                        }
                     }
                 })
                 .catch(function() {
