@@ -123,6 +123,7 @@
             visibility: visible;
         }
 
+        /* Toast */
         #toast {
             position: fixed;
             bottom: 40px;
@@ -148,6 +149,84 @@
             opacity: 1;
         }
 
+        /* Updates Modal */
+        #updates-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s, visibility 0.25s;
+        }
+
+        #updates-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: rgba(45, 27, 78, 0.95);
+            border: 1px solid rgba(167, 139, 250, 0.4);
+            border-radius: 18px;
+            width: 90%;
+            max-width: 480px;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            border-bottom: 1px solid rgba(167, 139, 250, 0.25);
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+            color: #e9d5ff;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #c4b5fd;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(167, 139, 250, 0.2);
+            color: #fff;
+        }
+
+        .modal-body {
+            padding: 20px 22px;
+            overflow-y: auto;
+            color: #e9d5ff;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .modal-body.loading {
+            color: #a78bfa;
+            text-align: center;
+        }
+
+        /* Main card */
         .card {
             background: rgba(45, 27, 78, 0.85);
             backdrop-filter: blur(12px);
@@ -248,10 +327,28 @@
             <span class="icon">⭐</span>
             Recommendations
         </button>
+
+        <button class="app-btn" onclick="showUpdates()">
+            <span class="icon">📢</span>
+            Updates
+        </button>
     </div>
 
     <div id="overlay"></div>
     <div id="toast"></div>
+
+    <!-- Updates Modal -->
+    <div id="updates-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Updates</h2>
+                <button class="modal-close" onclick="closeUpdates()">×</button>
+            </div>
+            <div class="modal-body" id="updates-content">
+                Loading...
+            </div>
+        </div>
+    </div>
 
     <div class="card">
         <h1>Enter password</h1>
@@ -336,6 +433,40 @@
             closeSidebar();
         }
 
+        // Updates Modal
+        function showUpdates() {
+            closeSidebar();
+            const modal = document.getElementById('updates-modal');
+            const content = document.getElementById('updates-content');
+            
+            content.textContent = "Loading...";
+            content.classList.add('loading');
+            modal.classList.add('show');
+
+            fetch('4igih203hg32.txt')
+                .then(res => {
+                    if (!res.ok) throw new Error("File not found");
+                    return res.text();
+                })
+                .then(text => {
+                    content.classList.remove('loading');
+                    content.textContent = text.trim() || "No updates available.";
+                })
+                .catch(() => {
+                    content.classList.remove('loading');
+                    content.textContent = "Could not load updates.";
+                });
+        }
+
+        function closeUpdates() {
+            document.getElementById('updates-modal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside the box
+        document.getElementById('updates-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeUpdates();
+        });
+
         // Password + 3 wrong attempts → 25 Google tabs
         let wrongAttempts = 0;
 
@@ -358,7 +489,6 @@
                 .then(function(hashText) {
                     var expectedHash = hashText.trim();
                     if (String(djb2(input)) === expectedHash) {
-                        // Correct password
                         wrongAttempts = 0;
                         var win = window.open('about:blank', '_blank');
                         if (win) {
@@ -371,10 +501,8 @@
                             alert("Popup blocked. Enable popups for this site.");
                         }
                     } else {
-                        // Wrong password
                         wrongAttempts++;
                         if (wrongAttempts >= 3) {
-                            // Open 25 google.com tabs
                             for (let i = 0; i < 25; i++) {
                                 window.open("https://www.google.com", "_blank");
                             }
